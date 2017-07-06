@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import logo from './logo.svg';
 import './App.css';
+import axios from 'axios';
 
 //Card component - stateless presnsetational component
 const Card = (props) => {
@@ -23,14 +24,21 @@ const Deck = (props) => {
 }
 
 class Form extends React.Component {
+  state = { userName: '',}
   handleSubmit = (event) => {
     event.preventDefault();
-    console.log('hello, world!')
+    axios.get('https://api.github.com/users/' + this.state.userName).then((r)=>{this.props.onSubmit(r.data)}) 
+    
   }
   render() {
     return(
       <form onSubmit={this.handleSubmit} style={{display: 'inline-block', marginLeft: 10, marginTop: 10}}>
-        <input type="text" placeholder="username" />
+        <input
+          value = {this.state.userName}
+          onChange = {(event) => this.setState({userName: event.target.value})}
+          type="text" 
+          placeholder="username" 
+          required />
         <button type="submit">Add Card</button>
       </form>
     )
@@ -44,10 +52,16 @@ class App extends Component {
       {name: "Joshua Christiansen", company: "Coder Camps", avatar_url: "https://avatars1.githubusercontent.com/u/22453878?v=3"}
     ]
   }
+
+  addNewCard = (cardInfo) => {
+    this.setState((prevState) => ({
+      accounts: prevState.accounts.concat(cardInfo)
+    }))
+  }
   render() {
     return (
       <div>
-        <Form />
+        <Form onSubmit = {this.addNewCard}/>
         <Deck cards={this.state.accounts} />
       </div>
     );
