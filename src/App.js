@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import logo from './logo.svg';
 import './App.css';
 import axios from 'axios';
 
@@ -18,7 +17,12 @@ const Card = (props) => {
 const Deck = (props) => {
   return (
     <div>
-      {props.cards.map(card => <Card {...card} />)}
+      <div>
+        {props.cards.map(card => <Card {...card} />)}
+      </div>
+      <div>
+        {props.errorMessage}
+      </div>
     </div>
   )
 }
@@ -27,7 +31,7 @@ class Form extends React.Component {
   state = { userName: '',}
   handleSubmit = (event) => {
     event.preventDefault();
-    axios.get('https://api.github.com/users/' + this.state.userName).then((r)=>{this.props.onSubmit(r.data)}) 
+    axios.get('https://api.github.com/users/' + this.state.userName).then((r)=>{this.props.onSubmit(r.data); this.setState({userName: ''})}) 
     
   }
   render() {
@@ -36,6 +40,7 @@ class Form extends React.Component {
         <input
           value = {this.state.userName}
           onChange = {(event) => this.setState({userName: event.target.value})}
+          ref = "form"
           type="text" 
           placeholder="username" 
           required />
@@ -48,8 +53,6 @@ class Form extends React.Component {
 class App extends Component {
   state = {
     accounts: [
-      {name: "Joshua Christiansen", company: "Atlas Financial Holdings", avatar_url: "https://avatars2.githubusercontent.com/u/22155222?v=3"},
-      {name: "Joshua Christiansen", company: "Coder Camps", avatar_url: "https://avatars1.githubusercontent.com/u/22453878?v=3"}
     ]
   }
 
@@ -61,8 +64,8 @@ class App extends Component {
   render() {
     return (
       <div>
-        <Form onSubmit = {this.addNewCard}/>
-        <Deck cards={this.state.accounts} />
+        <Form onSubmit = {this.addNewCard} />
+        <Deck cards={this.state.accounts} errorMessage={this.state.errorMessage} />
       </div>
     );
   }
